@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -10,9 +11,9 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Task::all();
+        $data = $request->user()->tasks;
         return response()->json($data);
     }
 
@@ -29,14 +30,15 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string',
             'description' => 'nullable|string',
             'due_date' => 'required|date',
             'status' => 'nullable|in:pending,in_progress,completed',
         ]);
 
-        $data = Task::create($request->all());
+        $validated['user_id'] = $request->user()->id;
+        $data = Task::create($validated);
 
         return response()->json($data,201);
     }
@@ -44,9 +46,16 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Task $task)
+    public function show(Request $request, Task $task)
     {
-        return response()->json($task);
+        $userId = $request->user()->id;
+
+        if($task->user_id === $userId)
+        {
+            return response()->json($task);
+        }else{
+            return response()->json(['message'=>'unauthorized!'], 403);
+        }
     }
 
     /**
@@ -62,25 +71,37 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'sometimes|required|string',
             'description' => 'sometimes|nullable|string',
             'due_date' => 'sometimes|required|date',
             'status' => 'nullable|in:pending,in_progress,completed',
         ]);
+        $userId = $request->user()->id;
 
-        $task->update($request->all());
-
-        return response()->json($task, 200);
+        if($task->user_id === $userId)
+        {
+            $task->update($validated);
+            return response()->json($task, 200);
+        }else{
+            return response()->json(['message'=>'unauthorized!'], 403);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Task $task)
+    public function destroy(Request $request, Task $task)
     {
-        $task->delete();
+        $userId = $request->user()->id;
 
-        return response()->json(null, 204);
+        if($task->user_id === $userId)
+        {
+            $task->delete();
+            return response()->json(null, 204);
+        }else{
+            return response()->json(['message'=>'unauthorized!'], 403);
+        }
+        
     }
 }
