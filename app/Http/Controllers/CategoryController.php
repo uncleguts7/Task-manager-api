@@ -17,6 +17,5 @@ class CategoryController extends Controller
     {   
         $category->load('products');
         return response()->json($category);
-
     }
 }
