@@ -1,15 +1,16 @@
-# Task Manager API
+# Laravel E-commerce API
 
-My first RESTful API using in PHP Laravel providing tasks management for personal requirement.  Key features are token based API authentication, ownership based access control with provides full-CRUD operation.
+A RESTful E-Commerce backend built with Laravel, featuring token based authentication, product & category management with many to many relationships, cart handling, and a personal task management module.
 
 ## Features
 
-- User registration and login with hashed passwords
-- Token authentication using Laravel Sanctum
-- Full CRUD on Tasks, that is to create, read, update and delete them
-- Ownership enforcement users cannot see or change other user items.
-- Request validation with expliciterror responses
+- User registration and login with token-based authentication (Laravel Sanctum)
+- Ownership based access control users can only access their own data
+- Product and Category management with many to many relationships
+- Shopping cart with automatic quantity handling (no duplicate items)
+- Full request validation with clear error responses
 - RESTful route design following standard conventions
+- Task management module (personal CRUD, unrelated to store features)
 
 ## API Endpoints
 
@@ -22,3 +23,12 @@ My first RESTful API using in PHP Laravel providing tasks management for persona
 | GET | /api/tasks/{id} | Get a single task | Yes |
 | PUT | /api/tasks/{id} | Update a task | Yes |
 | DELETE | /api/tasks/{id} | Delete a task | Yes |
+| GET | /api/categories | Get all Categories | No |
+| GET | /api/categories/{category} | Get a single Category | No |
+| GET | /api/products | Get all Products | No |
+| GET | /api/products/{product} | Get a single Category | No |
+| POST | /api/products | Add a product | No |
+| POST | /api/cart/add | Add a product in the cart | Yes |
+| GET | /api/cart | Showing the cart  | Yes |
+| PUT | /api/cart/items/{cartItem} | Updating cart item  | Yes |
+| DELETE | /api/cart/items/{cartItem} | Deleting cart item  | Yes |
