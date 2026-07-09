@@ -15,6 +15,7 @@ Route::get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('tasks', TaskController::class);
 
+    Route::post('/products',[ProductController::class, 'store']);
     Route::post('/cart/add',[CartController::class, 'addItem']);
     Route::get('/cart',[CartController::class, 'show']);
     Route::put('/cart/items/{cartItem}',[CartController::class, 'updateQuantity']);
@@ -29,6 +30,6 @@ Route::get('/categories/{category}',[CategoryController::class, 'show']);
 
 Route::get('/products',[ProductController::class, 'index']);
 Route::get('/products/{product}',[ProductController::class, 'show']);
-Route::post('/products',[ProductController::class, 'store']);
+
 
 

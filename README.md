@@ -26,8 +26,8 @@ A RESTful E-Commerce backend built with Laravel, featuring token based authentic
 | GET | /api/categories | Get all Categories | No |
 | GET | /api/categories/{category} | Get a single Category | No |
 | GET | /api/products | Get all Products | No |
-| GET | /api/products/{product} | Get a single Category | No |
-| POST | /api/products | Add a product | No |
+| GET | /api/products/{product} | Get a single Product | No |
+| POST | /api/products | Add a product | Yes |
 | POST | /api/cart/add | Add a product in the cart | Yes |
 | GET | /api/cart | Showing the cart  | Yes |
 | PUT | /api/cart/items/{cartItem} | Updating cart item  | Yes |
