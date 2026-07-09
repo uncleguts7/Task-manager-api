@@ -32,3 +32,4 @@ A RESTful E-Commerce backend built with Laravel, featuring token based authentic
 | GET | /api/cart | Showing the cart  | Yes |
 | PUT | /api/cart/items/{cartItem} | Updating cart item  | Yes |
 | DELETE | /api/cart/items/{cartItem} | Deleting cart item  | Yes |
+| POST | /api/checkout | Create an order from the cart and empty the cart | Yes |

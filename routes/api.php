@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/cart',[CartController::class, 'show']);
     Route::put('/cart/items/{cartItem}',[CartController::class, 'updateQuantity']);
     Route::delete('/cart/items/{cartItem}',[CartController::class, 'removeItem']);
+    Route::post('/checkout',[CartController::class, 'checkout']);
 });
 
 Route::post('/register',[AuthController::class, 'register']);
