@@ -34,6 +34,37 @@ class ProductController extends Controller
         $product = Product::create($validated);
         $product->categories()->attach($categoryIds);
         
-        return response()->json($product);
+        return response()->json($product, 201);
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'product_name' => 'sometimes|string',
+            'description' => 'sometimes|string',
+            'price' => 'sometimes|numeric',
+            'stock' => 'sometimes|integer',
+            'category_ids' => 'sometimes|array',
+        ]);
+
+        if($request->has('category_ids'))
+        {
+            $categoryIds = $validated['category_ids'];
+            unset($validated['category_ids']);
+            $product->update($validated);
+            $product->categories()->sync($categoryIds);
+
+            return response()->json($product, 200);    
+        }else{
+            $product->update($validated);
+            return response()->json($product, 200);
+        }
+        
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+        return response()->json(null, 204);
     }
 }

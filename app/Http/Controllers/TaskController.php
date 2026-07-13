@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Policies\TaskPolicy;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -46,16 +47,11 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Task $task)
+    public function show(Task $task)
     {
-        $userId = $request->user()->id;
-
-        if($task->user_id === $userId)
-        {
-            return response()->json($task);
-        }else{
-            return response()->json(['message'=>'unauthorized!'], 403);
-        }
+        $this->authorize('view', $task);
+        
+        return response()->json($task);
     }
 
     /**
@@ -77,31 +73,21 @@ class TaskController extends Controller
             'due_date' => 'sometimes|required|date',
             'status' => 'nullable|in:pending,in_progress,completed',
         ]);
-        $userId = $request->user()->id;
-
-        if($task->user_id === $userId)
-        {
-            $task->update($validated);
-            return response()->json($task, 200);
-        }else{
-            return response()->json(['message'=>'unauthorized!'], 403);
-        }
+        $this->authorize('update', $task);
+        $task->update($validated);
+        
+        return response()->json($task);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Task $task)
+    public function destroy(Task $task)
     {
-        $userId = $request->user()->id;
-
-        if($task->user_id === $userId)
-        {
-            $task->delete();
-            return response()->json(null, 204);
-        }else{
-            return response()->json(['message'=>'unauthorized!'], 403);
-        }
+        $this->authorize('delete', $task);
+        $task->delete();
+        
+        return response()->json(null, 204);
         
     }
 }
