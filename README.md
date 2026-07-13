@@ -15,6 +15,59 @@ A RESTful E-Commerce backend built with Laravel, featuring token-based authentic
 - RESTful route design following standard conventions
 - Task management module (personal CRUD, unrelated to store features)
 
+## Installation
+
+### Requirements
+- PHP 8.2+
+- Composer
+- MySQL
+
+### Setup
+
+1. Clone the repository
+   ```bash
+   git clone https://github.com/uncleguts7/laravel-ecommerce-api.git
+   cd laravel-ecommerce-api
+   ```
+
+2. Install PHP dependencies
+   ```bash
+   composer install
+   ```
+
+3. Copy the environment file and generate an app key
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. Configure your database credentials in `.env`
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=your_database_name
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
+   Make sure the database above already exists in MySQL before continuing.
+
+5. Run migrations and seed the database
+   ```bash
+   php artisan migrate --seed
+   ```
+   This creates all tables and seeds a default admin account:
+   - Email: `admin@example.com`
+   - Password: `admin911911`
+
+   Use these credentials to log in and test admin-only routes (product/category management).
+
+6. Serve the application
+   ```bash
+   php artisan serve
+   ```
+   The API will be available at `http://127.0.0.1:8000`.
+
 ## API Endpoints
 
 | Method | Endpoint | Description | Auth Required | Admin Only |
@@ -49,3 +102,88 @@ A RESTful E-Commerce backend built with Laravel, featuring token-based authentic
 - **Authentication** is handled via Laravel Sanctum protected routes require a valid bearer token.
 - **Admin-only routes** (creating/updating/deleting products and categories) are protected by a custom `IsAdmin` middleware that checks the authenticated user's `role` column.
 - **Ownership checks** (e.g. viewing/updating/deleting your own tasks, viewing your own orders) are handled through Laravel Policies rather than manual checks scattered across controllers.
+
+## Example Requests
+
+### Register
+```
+POST /api/register
+```
+```json
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+```
+
+### Login
+```
+POST /api/login
+```
+```json
+{
+  "email": "jane@example.com",
+  "password": "password123"
+}
+```
+Response:
+```json
+{
+  "token": "1|abcdef123456..."
+}
+```
+Include this token on all protected routes as a bearer token:
+```
+Authorization: Bearer 1|abcdef123456...
+```
+
+### Add to cart
+```
+POST /api/cart/add
+```
+```json
+{
+  "product_id": 2,
+  "quantity": 3
+}
+```
+
+### Checkout
+```
+POST /api/checkout
+```
+No request body needed converts the logged-in user's current cart into an order.
+
+Response:
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "status": "processing",
+  "total_price": 538.48,
+  "order_items": [
+    {
+      "product_id": 2,
+      "quantity": 3,
+      "price": "40.50",
+      "product": { "product_name": "GTA 5", "price": "40.50" }
+    }
+  ]
+}
+```
+
+### Create product (admin only)
+```
+POST /api/products
+```
+```json
+{
+  "product_name": "Wireless Mouse",
+  "description": "Ergonomic wireless mouse",
+  "price": 25.99,
+  "stock": 50,
+  "category_ids": [1, 3]
+}
+```
