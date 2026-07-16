@@ -10,7 +10,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $userId = $request->user()->id;
-        $orders = Order::where('user_id',$userId)->get();
+        $orders = Order::where('user_id',$userId)->with('orderItems.product')->get();
 
         return response()->json($orders, 200);
     }
