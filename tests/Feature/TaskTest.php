@@ -35,7 +35,7 @@ class TaskTest extends TestCase
             'status'=> 'completed',
         ]);
 
-        $response = $this->getJson('/api/tasks');
+        $response = $this->getJson('/api/v1/tasks');
         $response->assertStatus(200);
 
         $response->assertJsonFragment([
@@ -67,7 +67,7 @@ class TaskTest extends TestCase
             'status'=> 'pending',
         ]);
 
-        $response = $this->getJson('/api/tasks/'. $task->id);
+        $response = $this->getJson('/api/v1/tasks/'. $task->id);
         $response->assertStatus(200);
 
         $response->assertJson([
@@ -92,7 +92,7 @@ class TaskTest extends TestCase
             'status'=> 'completed',
         ]);
 
-        $response = $this->getJson('/api/tasks/'. $task->id);
+        $response = $this->getJson('/api/v1/tasks/'. $task->id);
         $response->assertStatus(403);
     }
 
@@ -108,7 +108,7 @@ class TaskTest extends TestCase
             'status'=> 'pending',
         ];
 
-        $response = $this->postJson('/api/tasks', $taskData);
+        $response = $this->postJson('/api/v1/tasks', $taskData);
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('tasks', [
@@ -140,7 +140,7 @@ class TaskTest extends TestCase
             'status'=> 'completed',
         ];
 
-        $response = $this->putJson('/api/tasks/'. $task->id, $updateData);
+        $response = $this->putJson('/api/v1/tasks/'. $task->id, $updateData);
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('tasks', [
@@ -173,7 +173,7 @@ class TaskTest extends TestCase
             'status'=> 'completed',
         ];
 
-        $response = $this->putJson('/api/tasks/'. $task->id, $updateData);
+        $response = $this->putJson('/api/v1/tasks/'. $task->id, $updateData);
         $response->assertStatus(403);
     }
 
@@ -190,7 +190,7 @@ class TaskTest extends TestCase
             'status'=> 'pending',
         ]);
 
-        $response = $this->deleteJson('/api/tasks/'. $task->id);
+        $response = $this->deleteJson('/api/v1/tasks/'. $task->id);
         $response->assertStatus(204);
 
         $this->assertDatabaseMissing('tasks', [
@@ -212,7 +212,7 @@ class TaskTest extends TestCase
             'status'=> 'completed',
         ]);
 
-        $response = $this->deleteJson('/api/tasks/'. $task->id);
+        $response = $this->deleteJson('/api/v1/tasks/'. $task->id);
         $response->assertStatus(403);
     }
 

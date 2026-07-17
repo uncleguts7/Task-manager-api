@@ -23,7 +23,7 @@ class OrderTest extends TestCase
             'status'=> 'pending',
         ]);
 
-        $response = $this->getJson('/api/orders/'. $order->id);
+        $response = $this->getJson('/api/v1/orders/'. $order->id);
         $response->assertStatus(401);
     }
 
@@ -38,7 +38,7 @@ class OrderTest extends TestCase
             'status'=> 'pending',
         ]);
 
-        $response = $this->getJson('/api/orders/'. $order->id);
+        $response = $this->getJson('/api/v1/orders/'. $order->id);
         $response->assertStatus(200);
     }
 
@@ -54,7 +54,7 @@ class OrderTest extends TestCase
             'status'=> 'pending',
         ]);
 
-        $response = $this->getJson('/api/orders/'. $order->id);
+        $response = $this->getJson('/api/v1/orders/'. $order->id);
         $response->assertStatus(403);
     }
 
@@ -76,7 +76,7 @@ class OrderTest extends TestCase
             'status'=> 'pending',
         ]);
         
-        $response = $this->getJson('/api/orders');
+        $response = $this->getJson('/api/v1/orders');
         $response->assertStatus(200);
         $response->assertJsonFragment(['id' => $order1->id]);
         $response->assertJsonMissing(['id' => $order2->id]);

@@ -10,10 +10,12 @@ A RESTful E-Commerce backend built with Laravel, featuring token-based authentic
 - Product and Category management with many-to-many relationships (admin only)
 - Shopping cart with automatic quantity handling (no duplicate items)
 - Checkout flow that converts a cart into an order using database transactions, with frozen pricing at time of purchase
-- Order history users can view their past orders and order details
+- Order history users can view their past orders (including ordered items) and individual order details
 - Full request validation with clear error responses, including partial updates
+- API versioning (`/api/v1/...`) so future breaking changes won't affect existing clients
 - RESTful route design following standard conventions
 - Task management module (personal CRUD, unrelated to store features)
+- Automated feature test suite (PHPUnit) covering authentication, authorization, ownership, validation, and business logic across every endpoint
 
 ## Installation
 
@@ -66,48 +68,58 @@ A RESTful E-Commerce backend built with Laravel, featuring token-based authentic
    ```bash
    php artisan serve
    ```
-   The API will be available at `http://127.0.0.1:8000`.
+   The API will be available at `http://127.0.0.1:8000`, with all endpoints under the `/api/v1/` prefix.
+
+### Running Tests
+
+This project includes a full PHPUnit feature test suite, run against an in-memory SQLite database (your MySQL data is never touched).
+
+```bash
+php artisan test
+```
 
 ## API Endpoints
 
+All endpoints are prefixed with `/api/v1`.
+
 | Method | Endpoint | Description | Auth Required | Admin Only |
 |--------|----------|--------------|----------------|------------|
-| POST | /api/register | Register a new user | No | No |
-| POST | /api/login | Login and receive a token | No | No |
-| GET | /api/tasks | Get all tasks for the logged-in user | Yes | No |
-| POST | /api/tasks | Create a new task | Yes | No |
-| GET | /api/tasks/{id} | Get a single task | Yes | No |
-| PUT | /api/tasks/{id} | Update a task | Yes | No |
-| DELETE | /api/tasks/{id} | Delete a task | Yes | No |
-| GET | /api/categories | Get all categories | No | No |
-| GET | /api/categories/{category} | Get a single category | No | No |
-| POST | /api/categories | Create a category | Yes | Yes |
-| PUT | /api/categories/{category} | Update a category | Yes | Yes |
-| DELETE | /api/categories/{category} | Delete a category | Yes | Yes |
-| GET | /api/products | Get all products | No | No |
-| GET | /api/products/{product} | Get a single product | No | No |
-| POST | /api/products | Create a product | Yes | Yes |
-| PUT | /api/products/{product} | Update a product | Yes | Yes |
-| DELETE | /api/products/{product} | Delete a product | Yes | Yes |
-| POST | /api/cart/add | Add a product to the cart | Yes | No |
-| GET | /api/cart | View the cart | Yes | No |
-| PUT | /api/cart/items/{cartItem} | Update cart item quantity | Yes | No |
-| DELETE | /api/cart/items/{cartItem} | Remove an item from the cart | Yes | No |
-| POST | /api/checkout | Create an order from the cart and empty the cart | Yes | No |
-| GET | /api/orders | Get order history for the logged-in user | Yes | No |
-| GET | /api/orders/{order} | Get details of a single order | Yes | No |
+| POST | /api/v1/register | Register a new user | No | No |
+| POST | /api/v1/login | Login and receive a token | No | No |
+| GET | /api/v1/tasks | Get all tasks for the logged-in user | Yes | No |
+| POST | /api/v1/tasks | Create a new task | Yes | No |
+| GET | /api/v1/tasks/{id} | Get a single task | Yes | No |
+| PUT | /api/v1/tasks/{id} | Update a task | Yes | No |
+| DELETE | /api/v1/tasks/{id} | Delete a task | Yes | No |
+| GET | /api/v1/categories | Get all categories | No | No |
+| GET | /api/v1/categories/{category} | Get a single category | No | No |
+| POST | /api/v1/categories | Create a category | Yes | Yes |
+| PUT | /api/v1/categories/{category} | Update a category | Yes | Yes |
+| DELETE | /api/v1/categories/{category} | Delete a category | Yes | Yes |
+| GET | /api/v1/products | Get all products | No | No |
+| GET | /api/v1/products/{product} | Get a single product | No | No |
+| POST | /api/v1/products | Create a product | Yes | Yes |
+| PUT | /api/v1/products/{product} | Update a product | Yes | Yes |
+| DELETE | /api/v1/products/{product} | Delete a product | Yes | Yes |
+| POST | /api/v1/cart/add | Add a product to the cart | Yes | No |
+| GET | /api/v1/cart | View the cart | Yes | No |
+| PUT | /api/v1/cart/items/{cartItem} | Update cart item quantity | Yes | No |
+| DELETE | /api/v1/cart/items/{cartItem} | Remove an item from the cart | Yes | No |
+| POST | /api/v1/checkout | Create an order from the cart and empty the cart | Yes | No |
+| GET | /api/v1/orders | Get order history (with items) for the logged-in user | Yes | No |
+| GET | /api/v1/orders/{order} | Get details of a single order | Yes | No |
 
 ## Authorization
 
 - **Authentication** is handled via Laravel Sanctum protected routes require a valid bearer token.
 - **Admin-only routes** (creating/updating/deleting products and categories) are protected by a custom `IsAdmin` middleware that checks the authenticated user's `role` column.
-- **Ownership checks** (e.g. viewing/updating/deleting your own tasks, viewing your own orders) are handled through Laravel Policies rather than manual checks scattered across controllers.
+- **Ownership checks** (e.g. viewing/updating/deleting your own tasks, viewing your own orders, managing your own cart items) are handled through Laravel Policies and explicit ownership checks, rather than leaving data unprotected.
 
 ## Example Requests
 
 ### Register
 ```
-POST /api/register
+POST /api/v1/register
 ```
 ```json
 {
@@ -120,7 +132,7 @@ POST /api/register
 
 ### Login
 ```
-POST /api/login
+POST /api/v1/login
 ```
 ```json
 {
@@ -141,20 +153,20 @@ Authorization: Bearer 1|abcdef123456...
 
 ### Add to cart
 ```
-POST /api/cart/add
+POST /api/v1/cart/add
 ```
 ```json
 {
-  "product_id": 2,
-  "quantity": 3
+  "product_id": 2
 }
 ```
+Adding the same product again increases its quantity rather than creating a duplicate cart item.
 
 ### Checkout
 ```
-POST /api/checkout
+POST /api/v1/checkout
 ```
-No request body needed converts the logged-in user's current cart into an order.
+No request body needed converts the logged-in user's current cart into an order using a database transaction, with prices frozen at time of purchase.
 
 Response:
 ```json
@@ -174,9 +186,32 @@ Response:
 }
 ```
 
+### Order history
+```
+GET /api/v1/orders
+```
+Returns all of the logged-in user's past orders, including their items and product details:
+```json
+[
+  {
+    "id": 1,
+    "status": "processing",
+    "total_price": 538.48,
+    "order_items": [
+      {
+        "product_id": 2,
+        "quantity": 3,
+        "price": "40.50",
+        "product": { "product_name": "GTA 5", "price": "40.50" }
+      }
+    ]
+  }
+]
+```
+
 ### Create product (admin only)
 ```
-POST /api/products
+POST /api/v1/products
 ```
 ```json
 {

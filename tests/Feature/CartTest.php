@@ -25,10 +25,10 @@ class CartTest extends TestCase
             'stock'=> 100,
         ]);
 
-        $response1 = $this->postJson('/api/cart/add', ['product_id'=> $product->id]);
+        $response1 = $this->postJson('/api/v1/cart/add', ['product_id'=> $product->id]);
         $response1->assertStatus(200);
 
-        $response2 = $this->postJson('/api/cart/add', ['product_id'=> $product->id]);
+        $response2 = $this->postJson('/api/v1/cart/add', ['product_id'=> $product->id]);
         $response2->assertStatus(200);
 
         $this->assertDatabaseCount('cart_items', 1);
@@ -59,12 +59,12 @@ class CartTest extends TestCase
             'stock'=> 50,
         ]);
 
-        $this->postJson('/api/cart/add', ['product_id'=> $product1->id]);
+        $this->postJson('/api/v1/cart/add', ['product_id'=> $product1->id]);
         Sanctum::actingAs($user2);
-        $this->postJson('/api/cart/add', ['product_id'=> $product2->id]);
+        $this->postJson('/api/v1/cart/add', ['product_id'=> $product2->id]);
 
         Sanctum::actingAs($user1);
-        $response = $this->getJson('/api/cart');
+        $response = $this->getJson('/api/v1/cart');
         $response->assertStatus(200);
 
         $response->assertJsonFragment([
@@ -88,11 +88,11 @@ class CartTest extends TestCase
             'stock'=> 100,
         ]);
 
-        $this->postJson('/api/cart/add', ['product_id'=> $product->id]);
+        $this->postJson('/api/v1/cart/add', ['product_id'=> $product->id]);
 
         $cartItem = $user->cart->cartItems()->first();
 
-        $response = $this->putJson('/api/cart/items/'. $cartItem->id, ['quantity'=> 5]);
+        $response = $this->putJson('/api/v1/cart/items/'. $cartItem->id, ['quantity'=> 5]);
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('cart_items', [
@@ -115,12 +115,12 @@ class CartTest extends TestCase
             'stock'=> 100,
         ]);
 
-        $this->postJson('/api/cart/add', ['product_id'=> $product->id]);
+        $this->postJson('/api/v1/cart/add', ['product_id'=> $product->id]);
 
         $cartItem = $user1->cart->cartItems()->first();
 
         Sanctum::actingAs($user2);
-        $response = $this->putJson('/api/cart/items/'. $cartItem->id, ['quantity'=> 5]);
+        $response = $this->putJson('/api/v1/cart/items/'. $cartItem->id, ['quantity'=> 5]);
         $response->assertStatus(403);
     }
 
@@ -136,11 +136,11 @@ class CartTest extends TestCase
             'stock'=> 100,
         ]);
 
-        $this->postJson('/api/cart/add', ['product_id'=> $product->id]);
+        $this->postJson('/api/v1/cart/add', ['product_id'=> $product->id]);
 
         $cartItem = $user->cart->cartItems()->first();
 
-        $response = $this->deleteJson('/api/cart/items/'. $cartItem->id);
+        $response = $this->deleteJson('/api/v1/cart/items/'. $cartItem->id);
         $response->assertStatus(204);
 
         $this->assertDatabaseMissing('cart_items', [
@@ -161,12 +161,12 @@ class CartTest extends TestCase
             'stock'=> 100,
         ]);
 
-        $this->postJson('/api/cart/add', ['product_id'=> $product->id]);
+        $this->postJson('/api/v1/cart/add', ['product_id'=> $product->id]);
 
         $cartItem = $user1->cart->cartItems()->first();
 
         Sanctum::actingAs($user2);
-        $response = $this->deleteJson('/api/cart/items/'. $cartItem->id);
+        $response = $this->deleteJson('/api/v1/cart/items/'. $cartItem->id);
         $response->assertStatus(403);
     }
 }

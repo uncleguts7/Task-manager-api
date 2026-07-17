@@ -18,7 +18,7 @@ class CategoryTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/categories', [
+        $response = $this->postJson('/api/v1/categories', [
             'category_name' => 'Test Category',
             'description' => 'A test category',
         ]);
@@ -31,7 +31,7 @@ class CategoryTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson('/api/categories', [
+        $response = $this->postJson('/api/v1/categories', [
             'category_name' => 'Test Category',
             'description' => 'A test category',
         ]);
@@ -53,7 +53,7 @@ class CategoryTest extends TestCase
             'description' => 'games category',
         ]);
 
-        $response = $this->putJson('/api/categories/' . $category->id, [
+        $response = $this->putJson('/api/v1/categories/' . $category->id, [
             'category_name' => 'Updated Games',
             'description' => 'An updated games category',
         ]);
@@ -75,7 +75,7 @@ class CategoryTest extends TestCase
             'description' => 'games category',
         ]);
 
-        $response = $this->putJson('/api/categories/' . $category->id, [
+        $response = $this->putJson('/api/v1/categories/' . $category->id, [
             'category_name' => 'Updated Games',
             'description' => 'An updated games category',
         ]);
@@ -93,7 +93,7 @@ class CategoryTest extends TestCase
             'description' => 'games category',
         ]);
 
-        $response = $this->deleteJson('/api/categories/' . $category->id);
+        $response = $this->deleteJson('/api/v1/categories/' . $category->id);
 
         $response->assertStatus(204);
 
@@ -112,7 +112,7 @@ class CategoryTest extends TestCase
             'description' => 'games category',
         ]);
 
-        $response = $this->deleteJson('/api/categories/' . $category->id);
+        $response = $this->deleteJson('/api/v1/categories/' . $category->id);
 
         $response->assertStatus(403);
     }

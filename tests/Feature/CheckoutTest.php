@@ -17,7 +17,7 @@ class CheckoutTest extends TestCase
 
     public function test_checkout_requires_authentication(): void
     {
-        $response = $this->postJson('/api/checkout');
+        $response = $this->postJson('/api/v1/checkout');
 
         $response->assertStatus(401);
     }
@@ -45,7 +45,7 @@ class CheckoutTest extends TestCase
             'quantity'=> 10,
         ]);
 
-        $response = $this->postJson('/api/checkout');
+        $response = $this->postJson('/api/v1/checkout');
         
         $response->assertStatus(201);
         $response->assertJson([
@@ -63,7 +63,7 @@ class CheckoutTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $response = $this->postJson('/api/checkout');
+        $response = $this->postJson('/api/v1/checkout');
         $response->assertStatus(422);
     }
 
@@ -73,7 +73,7 @@ class CheckoutTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/checkout');
+        $response = $this->postJson('/api/v1/checkout');
         $response->assertStatus(404);
     }
 }

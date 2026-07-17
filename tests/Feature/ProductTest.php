@@ -19,7 +19,7 @@ class ProductTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/products', [
+        $response = $this->postJson('/api/v1/products', [
             'product_name' => 'Test Product',
             'description' => 'A test product',
             'price' => 50,
@@ -39,7 +39,7 @@ class ProductTest extends TestCase
             'description' => 'A test category',
         ]);
 
-        $response = $this->postJson('/api/products', [
+        $response = $this->postJson('/api/v1/products', [
             'product_name' => 'Test Product',
             'description' => 'A test product',
             'price' => 50,
@@ -71,7 +71,7 @@ class ProductTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson('/api/products', [
+        $response = $this->postJson('/api/v1/products', [
             'product_name' => '',
             'description' => '',
             'price' => -10,
@@ -95,7 +95,7 @@ class ProductTest extends TestCase
             'stock' => 10,
         ]);
 
-        $response = $this->putJson('/api/products/' . $product->id, [
+        $response = $this->putJson('/api/v1/products/' . $product->id, [
             'product_name' => 'Updated Product',
         ]);
 
@@ -114,7 +114,7 @@ class ProductTest extends TestCase
             'stock' => 10,
         ]);
 
-        $response = $this->putJson('/api/products/'. $product->id, [
+        $response = $this->putJson('/api/v1/products/'. $product->id, [
             'product_name' => 'Updated Product',
             'price' => 60,
         ]);
@@ -152,7 +152,7 @@ class ProductTest extends TestCase
         $product->categories()->attach($category1->id);
 
         // Update the product to sync with the second category
-        $response = $this->putJson('/api/products/'. $product->id, [
+        $response = $this->putJson('/api/v1/products/'. $product->id, [
             'category_ids' => [$category2->id],
         ]);
 
@@ -181,7 +181,7 @@ class ProductTest extends TestCase
             'stock' => 10,
         ]);
 
-        $response = $this->deleteJson('/api/products/' . $product->id);
+        $response = $this->deleteJson('/api/v1/products/' . $product->id);
         $response->assertStatus(403);
     }
 
@@ -204,7 +204,7 @@ class ProductTest extends TestCase
 
         $product->categories()->attach($category->id);
 
-        $response = $this->deleteJson('/api/products/' . $product->id);
+        $response = $this->deleteJson('/api/v1/products/' . $product->id);
         $response->assertStatus(204);
 
         $this->assertDatabaseMissing('products', [
